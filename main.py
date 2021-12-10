@@ -3,6 +3,16 @@ import csv
 import googleapiclient.discovery
 from key import KEY
 
+def write_data(data, startIdx):
+    with open("comments.csv", "a", newline="\n") as csvfile:
+        dwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        dwriter.writerow(["Comment ID", "Comment Text", "Incongruity", "Superiority"])
+
+        for i in range(len(data["items"])):
+            dwriter.writerow([str(i + startIdx), data["items"][i]["snippet"]["topLevelComment"]["snippet"]["textDisplay"], "0", "0"])
+
+    return 100 + startIdx
+
 def get_comments():
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
@@ -17,25 +27,31 @@ def get_comments():
 
     request = youtube.commentThreads().list(
         part="snippet,replies",
-        videoId="nH_bEtbfB9U"
+        videoId="nH_bEtbfB9U",
+        maxResults=100
     )
 
-    response = request.execute()
+    startIdx = 0
 
-    return response
+    while request:
 
+        response = request.execute()
+        startIdx = write_data(response, startIdx)
 
-def write_data(data):
-    with open("comments.csv", "w", newline="\n") as csvfile:
-        dwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        dwriter.writerow(["Comment ID", "Comment Text", "Incongruity", "Superiority"])
+        try: 
+            nextPageToken = response["nextPageToken"]
 
-        for i in range(len(data["items"])):
-            dwriter.writerow([str(i), data["items"][i]["snippet"]["topLevelComment"]["snippet"]["textDisplay"], "0", "0"])
+            request = youtube.commentThreads().list(
+                part="snippet,replies",
+                videoId="nH_bEtbfB9U",
+                maxResults=100,
+                pageToken=nextPageToken
+            )
+        except:
+            return
 
 def main():
     commentData = get_comments();
-    write_data(commentData);
 
 if __name__ == "__main__":
     main()
