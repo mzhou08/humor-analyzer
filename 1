@@ -4,14 +4,17 @@ import googleapiclient.discovery
 from key import KEY
 
 def write_data(data, startIdx, num_inc, num_sup, num_both, num_none):
-    incog = ["surprising", "surprised", "unexpected", "underrated",
-            "actually"]
+    incog = ["surprisingly", "surprising", 
+            "unexpectedly", "unexpected", 
+            "disturbingly", "legit", "legitimately", 
+            "really", "genuinely"]
 
-    superior = ["fever dream", "surreal", "so bad"]
+    superior = ["fever dream", "surreal", "underrated", "actually"]
 
 
     with open("comments.csv", "a", newline="\n") as csvfile:
         dwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        dwriter.writerow(["Comment ID", "Comment Text", "Incongruity", "Superiority"])
 
         for i in range(len(data["items"])):
             content = data["items"][i]["snippet"]["topLevelComment"]["snippet"]["textOriginal"]
@@ -20,21 +23,17 @@ def write_data(data, startIdx, num_inc, num_sup, num_both, num_none):
 
             for ic in incog:
                 if ic in content.lower():
-                    inc += 1
+                    inc = 1
                     num_inc += 1
                     break
             for sp in superior:
                 if sp in content.lower():
-                    sup += 1
+                    sup = 1
                     num_sup += 1
                     break
-            #if "actually" in content.lower():
-            #    print(content)
 
             if inc == 1 or sup == 1:
-                if inc == 1 and sup == 1:
-                    num_both += 1
-                
+                if inc == 1 and sup == 1: num_both += 1
                 dwriter.writerow([str(i + startIdx), content, str(inc), str(sup)])
 
             else:
@@ -65,22 +64,17 @@ def get_comments():
     num_sup = 0
     num_both = 0
     num_none = 0
-    
-    with open("comments.csv", "w", newline="\n") as csvfile:
-        dwriter = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        dwriter.writerow(["Comment ID", "Comment Text", "Incongruity", "Superiority"])
-
 
     while request:
 
         response = request.execute()
-        new_vals = write_data(response, startIdx, num_inc, num_sup, num_both, num_none)
+        to_add = write_data(response, startIdx, num_inc, num_sup, num_both, num_none)
         startIdx += 100
 
-        num_inc = new_vals[0]
-        num_sup  = new_vals[1]
-        num_both = new_vals[2]
-        num_none = new_vals[3]
+        num_inc += int(to_add[0])
+        num_sup += int(to_add[1])
+        num_both += int(to_add[2])
+        num_none += int(to_add[3])
 
         try: 
             nextPageToken = response["nextPageToken"]
@@ -99,8 +93,19 @@ def get_comments():
                 + "\nNumber of none are: " + str(num_none))
             return
 
+def analyze_comments():
+    with open("comments.csv", "r", newline="\n") as csvfile:
+
+        with open("analysis.csv", "w", newline="\n") as csv_towrite:
+            dwriter = csv.writer(csv_towrite, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            lines = csvfile.readlines()
+
+
+
+
 def main():
     commentData = get_comments();
+    analyze_comments()
 
 if __name__ == "__main__":
     main()
