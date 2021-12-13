@@ -1,5 +1,6 @@
 # humor-analyzer
-Youtube Comment Analyzer for 76-101 Interpretation and Argument Final Paper.
+Youtube Comment Analyzer for 76-101 Interpretation and Argument Final Paper - 
+"Applying Superiority and Incongruity Theory to Understand Reactions to AI-Generated Humor"
 
 Analyzes the entire comment section of the YouTube video 
 "The First Stand-Up Comedy Special Written Entirely By Bots"
