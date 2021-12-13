@@ -52,7 +52,9 @@ def write_data(data::dict, startIdx::int, num_inc::int, num_sup::int, num_both::
 
     return [startIdx + num_items, int(num_inc), int(num_sup), int(num_both), int(num_none)] 
 
-def get_comments():
+# Get comment data from a YouTube video using the YouTube Data v3 API.
+
+def get_comments(videoId::str):
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -66,7 +68,7 @@ def get_comments():
 
     request = youtube.commentThreads().list(
         part="snippet,replies",
-        videoId="nH_bEtbfB9U",
+        videoId=videoId,
         maxResults=100
     )
 
@@ -97,7 +99,7 @@ def get_comments():
 
             request = youtube.commentThreads().list(
                 part="snippet,replies",
-                videoId="nH_bEtbfB9U",
+                videoId=videoId,
                 maxResults=100,
                 pageToken=nextPageToken
             )
@@ -110,7 +112,7 @@ def get_comments():
             return
 
 def main():
-    commentData = get_comments();
+    commentData = get_comments("nH_bEtbfB9U");
 
 if __name__ == "__main__":
     main()
