@@ -53,7 +53,10 @@ def write_data(data::dict, startIdx::int, num_inc::int, num_sup::int, num_both::
     return [startIdx + num_items, int(num_inc), int(num_sup), int(num_both), int(num_none)] 
 
 # Get comment data from a YouTube video using the YouTube Data v3 API.
-
+# videoId: string containing a YouTube video ID.
+# Found at the end of a YouTube URL, following "v="
+# Prints number of comment in each category
+# Writes the content of comments that fit at least one theory to comments.csv
 def get_comments(videoId::str):
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
